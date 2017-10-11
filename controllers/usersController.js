@@ -1,3 +1,6 @@
+var dbController = require('./dbController');
+
+
 var getMessages = function(token, userId, res) {
 
 }
