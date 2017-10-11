@@ -18,10 +18,10 @@ router.get('/api/users/unread/:userId', function(req, res, next) {
 
 /* POST new message */
 router.post('/api/messages', function(req, res, next) {
-	body = req.body
+	body = req.body;
 	if (!("message" in body) || !("userId" in body)) {
 		res.status(400);
-		res.send("Body must contain message and recipient userId");
+		res.send("Body must contain message and recipient userId\n");
 	} else {
 		messagesController.newMessage(req.get("token"),
 				body["message"], body["sender"], body["recipient"]);
@@ -35,9 +35,10 @@ router.delete('/api/messages/:messageId', function(req, res, next) {
 
  /* GET a product recommendation */
 router.get('/api/products', function(req, res, next) {
+	body = req.body;
 	if (!("product" in body)) {
 		res.status(400);
-		res.send("Body must contain a product search term");
+		res.send("Body must contain a product search term\n");
 	} else {
 		productsController.getProductLink(req.get("token"), body["product"]);
 	}
