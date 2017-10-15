@@ -6,6 +6,10 @@ var messagesController = require('../controllers/messagesController');
 var usersController = require('../controllers/usersController');
 var productsController = require('../controllers/productsController');
 
+router.get('/api', function(req, res) {
+	res.json({ message: 'Welcome to the coolest API on earth!' });
+  });
+
 /* GET all messages from a user. */
 router.get('/api/users/:userId', function(req, res, next) {
 	usersController.getMessages(req.get("token"), req.params["userId"], res);

@@ -1,12 +1,11 @@
 var dbController = require('./dbController');
 
-
 var getMessages = function(token, userId, res) {
-    dbController.getMessages(userId);
+    dbController.getMessages(userId, res);
 }
 
 var getUnreadMessages = function(token, userId, res) {
 
 }
 
-module.exports =getMessages, getUnreadMessages;
+module.exports = {getMessages, getUnreadMessages};

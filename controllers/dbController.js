@@ -1,32 +1,3 @@
-// var sql = require('sql');
-// var sqlite3 = require('sqlite3');
-
-// var db = new sqlite3.Database(':memory:');
-// sql.setDialect('sqlite');
-
-// var message = sql.define({
-// 	name: 'message',
-// 	columns: ['id', 'userId', 'timestamp', 'read', 'body']
-// });
-
-// var user = sql.define({
-// 	name: 'user',
-// 	columns: ['id', 'hashToken']
-// });
-
-// var addMessage = function(userId, timestamp, body) {
-// 	var query = message.insert(
-// 		message.id.value(0),
-// 		message.userId.value(userId),
-// 		message.timestamp.value(timestamp),
-// 		message.read.value(false),
-// 		message.body.value(body)
-// 	).toQuery();
-// 	console.log(query.text);
-// 	console.log(query.values);
-// 	//db.run(query.text);
-// }
-
 /** Using DynamoDB from AWS **/
 
 var AWS = require('aws-sdk');
@@ -35,48 +6,103 @@ AWS.config.loadFromPath('./aws-config.json');
 
 var dynamodb = new AWS.DynamoDB();
 
-var addMessage = function(userId, timestamp, body) {
+var addMessage = function(messageId, userId, body) {
 	var params = {
 		TableName: 'Messages',
 		Item: {
-		  'id': {N: '1'},
-		  'user_id': {N: userId},
-		  'timestamp': {S: Date.now().toString()},
-		  'read': {BOOL: false},
-		  'body': {S: body}
+			'messageId': {N: messageId},
+			'userId': {N: userId},
+			'receivedTime': {S: new Date().toString()},
+			'read': {BOOL: false},
+			'body': {S: body}
 		}
-	  };
-	  
-	  dynamodb.putItem(params, function(err, data) {
+	};
+	
+	dynamodb.putItem(params, function(err, data) {
 		if (err) {
-		  console.log("Error", err);
+			console.log("Error", err);
 		} else {
-		  console.log("Success", data);
+			console.log("Successfully added message");
 		}
-	  });
+	});
 }
 
-var getMessages = function(userId) {
+var getMessages = function(userId, res) {
+
 	var params = {
 		RequestItems: {
-		  'Messages': {
-			Keys: [
-			  {'id': {N: userId}}
-			],
-			ProjectionExpression: 'userId, body'
-		  }
+			'Messages': {
+				Keys: [
+					{'messageId': {N: "1"}}
+				],
+				ProjectionExpression: 'userId, receivedTime, body'
+			}
 		}
-	  };
+	};
 	  
-	  dynamodb.batchGetItem(params, function(err, data) {
+	dynamodb.batchGetItem(params, function(err, data) {
 		if (err) {
-		  console.log("Error", err);
+			console.log("Error", err);
 		} else {
-		  data.Responses.Messages.forEach(function(element, index, array) {
-			console.log(element);
-		  });
+			console.log("data", data.Responses.Messages);
+			data.Responses.Messages.forEach(function(element, index, array) {
+				// set 'read' to true
+				res.json(element);
+			});
 		}
-	  });
+	});
 }
+
+
+
+
+// /** Using RDS from AWS **/
+
+// var mysql = require('mysql');
+
+// var db;
+
+// var connectToDB = function() {
+
+// 	var connection = mysql.createConnection({
+// 		host: 'echome-db.cdwdr3fxmjiq.us-east-1.rds.amazonaws.com',
+// 		user: 'chainvaper',
+// 		password: 'Chainvapers!',
+// 		port: 3306,
+// 		database: 'echome_db'
+// 	});
+
+// 	return connection.connect(function(err) {
+// 		if (err) {
+// 			console.log(err.stack);
+// 		} else {
+// 			console.log("Successfully connected to database")
+// 		}
+// 	});
+// }
+
+// var getMessages = function(userId, res) {
+
+// 	if (!this.db) {
+// 		this.db = connectToDB();
+// 	}
+
+// 	this.db.query('SELECT * FROM messages', function (err, results) {
+// 		if (err) {
+// 			console.log(err.stack);
+// 		} else {
+// 			console.log("user ID", userId);
+// 			console.log(results);
+// 		}
+// 	});
+// }
+
+// var addMessage = function(messageId, userId, body) {
+
+// }
+
+
+
+
 
 module.exports = {addMessage, getMessages};
