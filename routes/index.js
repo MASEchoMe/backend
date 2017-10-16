@@ -6,9 +6,16 @@ var messagesController = require('../controllers/messagesController');
 var usersController = require('../controllers/usersController');
 var productsController = require('../controllers/productsController');
 
-router.get('/api', function(req, res) {
-	res.json({ message: 'Welcome to the coolest API on earth!' });
-  });
+/* POST new user */
+router.post('/api/users', function(req, res, next) {
+	body = req.body;
+	if (!("name" in body)) {
+		res.status(400);
+		res.send("Body must contain a name\n");
+	} else {
+		usersController.addUser(req.get("token"), body["name"], res);
+	}
+});
 
 /* GET all messages from a user. */
 router.get('/api/users/:userId', function(req, res, next) {
@@ -23,18 +30,18 @@ router.get('/api/users/unread/:userId', function(req, res, next) {
 /* POST new message */
 router.post('/api/messages', function(req, res, next) {
 	body = req.body;
-	if (!("message" in body) || !("userId" in body)) {
+	if (!("message" in body) || !("sender" in body) || !("recipient" in body)) {
 		res.status(400);
-		res.send("Body must contain message and recipient userId\n");
+		res.send("Body must contain a message, a sender, and a recipient\n");
 	} else {
 		messagesController.newMessage(req.get("token"),
-				body["message"], body["sender"], body["recipient"]);
+				body["message"], body["sender"], body["recipient"], res);
 	}
 });
 
 /* DELETE a message (must have receiver's token) */
 router.delete('/api/messages/:messageId', function(req, res, next) {
-	messagesController.deleteMessage(req.get("token"), req.params["messageId"])
+	messagesController.deleteMessage(req.get("token"), req.params["messageId"], res)
 });
 
  /* GET a product recommendation */
@@ -44,7 +51,7 @@ router.get('/api/products', function(req, res, next) {
 		res.status(400);
 		res.send("Body must contain a product search term\n");
 	} else {
-		productsController.getProductLink(req.get("token"), body["product"]);
+		productsController.getProductLink(req.get("token"), body["product"], res);
 	}
 })
 

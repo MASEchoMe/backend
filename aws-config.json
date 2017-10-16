@@ -3,7 +3,6 @@
     "secretAccessKey": "Gb6ig/bobC5c4ojvkbOKvEiNpkRZiveV1OjP+0Lf",
     "region": "us-east-1",
     "apiVersions": {
-        "dynamodb": "latest",
         "rds": "latest"
     }
 }
