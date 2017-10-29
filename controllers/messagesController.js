@@ -1,13 +1,11 @@
 var dbController = require('./dbController');
 
-dbController.addMessage("1234", "103124123", "This is a test message");
-
-var newMessage = function(token, message, sender, recipient) {
-
+var newMessage = function(token, message, sender, recipient, res) {
+    dbController.addMessage(message, sender, recipient, res);
 }
 
-var deleteMessage = function(token, messageId) {
-
+var deleteMessage = function(token, messageId, res) {
+    dbController.deleteMessage(token, messageId, res);
 }
 
-module.exports = newMessage, deleteMessage;
+module.exports = {newMessage, deleteMessage};
