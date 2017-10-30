@@ -6,14 +6,40 @@ var messagesController = require('../controllers/messagesController');
 var usersController = require('../controllers/usersController');
 var productsController = require('../controllers/productsController');
 
+/* POST new group */
+router.post('/api/newGroup', function(req, res, next) {
+	body = req.body;
+	usersController.newGroup(res);
+});
+
 /* POST new user */
-router.post('/api/users', function(req, res, next) {
+router.post('/api/newUserTempToken', function(req, res, next) {
 	body = req.body;
 	if (!("name" in body)) {
 		res.status(400);
 		res.send("Body must contain a name\n");
 	} else {
-		usersController.addUser(req.get("token"), body["name"], res);
+		usersController.newUserTempToken(body["name"], res);
+	}
+});
+
+router.get('/api/getUserTempToken', function(req, res, next) {
+	body = req.body;
+	if (!("token" in body)) {
+		res.status(400);
+		res.send("Body must contain a token\n");
+	} else {
+		usersController.getUserTempToken(body["token"], res);
+	}
+});
+
+router.get('/api/getUserToken', function(req, res, next) {
+	body = req.body;
+	if (!("tempToken" in body)) {
+		res.status(400);
+		res.send("Body must contain a tempToken\n");
+	} else {
+		usersController.getUserToken(body["tempToken"], res);
 	}
 });
 

@@ -24,16 +24,18 @@ connection.connect(function(err) {
  * @param {*} name 
  * @param {*} res 
  */
-var addUser = function(name, res) {
+var addUser = function(name, groupId, token, res, callback) {
 
+/* TODO:::::::::::::: */
+/* UPDATE THE QUERY TO INCLUDE GROUPID AND TOKEN */
 	var query = 'INSERT INTO users (name, create_date, is_active) VALUES (?, ?, 1)';
 
 	connection.query(query, [name, new Date()], function (err, results) {
 		if (err) {
 			res.status(400);
-			res.send(err);
+			res.write(err);
 		} else {
-			res.send("Successfully added " + name + " as a user");
+			callback();
 		}
 	});
 }
@@ -74,9 +76,9 @@ var addMessage = function(message, senderName, recipientName, res) {
 			connection.query(query, [values], function (err, results) {
 				if (err) {
 					res.status(400);
-					res.send(err);
+					res.write(err);
 				} else {
-					res.send("Successfully added " + senderName + "'s message to " + recipientName);
+					res.write("Successfully added " + senderName + "'s message to " + recipientName);
 				}
 			});
 		}
@@ -168,6 +170,11 @@ var getUnreadMessages = function(token, userId, res) {
 	});
 }
 
+var getUserByNameAndToken = function(token, name, callback) {
+	// get user with name or token
+	callback(null);
+}
+
 module.exports = {addUser, addMessage, deleteMessage, getMessages, getUnreadMessages};
 
 /****************************** Helper Methods ******************************/
@@ -195,3 +202,5 @@ var getUsers = function(senderName, recipientName, callback) {
 		}
 	});
 }
+
+
