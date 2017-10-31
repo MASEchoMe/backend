@@ -1,8 +1,0 @@
-{
-    "accessKeyId": "AKIAIER265ZMTMMO5I7A",
-    "secretAccessKey": "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",
-    "region": "us-east-1",
-    "apiVersions": {
-        "rds": "latest"
-    }
-}
