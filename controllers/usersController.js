@@ -1,13 +1,37 @@
-var smallrand = require('unique-random')(100000, 999999);
-var bigrand = require('unique-random')(100000000000000000000000,
-                                       999999999999999999999999);
+var smallrand = require('unique-random')(10000000, 99999999);
 
 var dbController = require('./dbController');
 
 var tempTokens = {};
 
+/*****************************
+ ********** Helpers **********
+ *****************************
+ */
+
+var token16 = function() {
+    str = ""
+    for (var i = 0; i < 2; i++) {
+        str += smallrand();
+    }
+    return str;
+}
+
+var token256 = function() {
+    str = ""
+    for (var i = 0; i < 16; i++) {
+        str += token16();
+    }
+    return str;
+}
+
+/*****************************
+ ********** Helpers **********
+ *****************************
+ */
+
 var newGroup = function(res) {
-    groupToken = bigrand();
+    groupToken = token256();
     res.json({
         "groupId": groupToken
     });
@@ -25,12 +49,13 @@ var newGroup = function(res) {
  * device and use whenever you need to authenticate a user.
  */
 var newUserTempToken = function(name, groupId, res) {
-    tempToken = smallrand();
-    bigToken = bigrand();
+    tempToken = token16();
+    bigToken = token256();
     dbController.addUser(name, groupId, bigToken, res, function() {
         tempTokens[tempToken] = {
             "token": bigToken,
-            "timestamp": new Date().getTime() / 1000
+            "timestamp": new Date().getTime() / 1000,
+            "name": name
         };
         res.json({"tempToken": tempToken});
         res.end();
@@ -44,10 +69,10 @@ var newUserTempToken = function(name, groupId, res) {
  * extended token that you have saved for the account on the
  * Alexa or app.
  */
-var getUserTempToken = function(token, res) {
-    tempToken = smallrand();
+var getUserTempToken = function(token, name, res) {
+    tempToken = token16();
     console.log(tempToken);
-    dbController.getUserByNameAndToken(token, name, function(user) {
+    dbController.getUserByTokenAndName(token, name, function(user) {
         if (user == null) {
             // If the token is wrong or user doesn't exist, throw
             // authentication error.
@@ -55,14 +80,16 @@ var getUserTempToken = function(token, res) {
         } else {
             // If the user does exist, simply return a temporary token
             // that can be used to fetch the permanent token
-            tempToken = smallrand();
+
+            tempToken = token16();
             tempTokens[tempToken] = {
-                "token": bigToken,
-                "timestamp": new Date().getTime() / 1000
+                "token": user.token,
+                "timestamp": new Date().getTime() / 1000,
+                "name": name
             };
             res.json({
                 "tempToken": tempToken,
-                "name": name
+                "name": user.name
             });
             res.end();
         }
@@ -76,10 +103,12 @@ var getUserTempToken = function(token, res) {
  */
 var getUserToken = function(tempToken, res) {
     var time = new Date().getTime() / 1000;
-    if (time - tempTokens[tempToken].timestamp < 60000) {
+    if (tempToken in tempTokens &&
+                time - tempTokens[tempToken].timestamp < 60000) {
+        console.log("Getting the user's token");
         res.json({
-            "token": tempTokens[name].bigToken,
-            "name": name
+            "token": tempTokens[tempToken].token,
+            "name": tempTokens[tempToken].name
         });
         res.end();
     } else {

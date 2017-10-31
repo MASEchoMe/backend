@@ -28,12 +28,13 @@ var addUser = function(name, groupId, token, res, callback) {
 
 /* TODO:::::::::::::: */
 /* UPDATE THE QUERY TO INCLUDE GROUPID AND TOKEN */
-	var query = 'INSERT INTO users (name, create_date, is_active) VALUES (?, ?, 1)';
+	var query = 'INSERT INTO users (name, create_date, token, group_id, is_active) VALUES (?, ?, ?, ?, 1)';
 
-	connection.query(query, [name, new Date()], function (err, results) {
+	connection.query(query, [name, new Date(), token, groupId], function (err, results) {
 		if (err) {
 			res.status(400);
-			res.write(err);
+			console.log(err);
+			res.send("A database error occured");
 		} else {
 			callback();
 		}
@@ -170,9 +171,21 @@ var getUnreadMessages = function(token, userId, res) {
 	});
 }
 
-var getUserByNameAndToken = function(token, name, callback) {
+var getUserByTokenAndName = function(token, name, callback) {
 	// get user with name or token
-	callback(null);
+	var query = 'SELECT name, token FROM users WHERE name=? and token=?';
+
+	connection.query(query, [name, token], function(err, results) {
+		if (err) {
+			callback(null);
+		} else {
+			var user = {
+				"name ": results[0].name,
+				"token": results[0].token
+			};
+			callback(user);
+		}
+	});
 }
 
 module.exports = {addUser, addMessage, deleteMessage, getMessages, getUnreadMessages};

@@ -15,11 +15,13 @@ router.post('/api/newGroup', function(req, res, next) {
 /* POST new user */
 router.post('/api/newUserTempToken', function(req, res, next) {
 	body = req.body;
-	if (!("name" in body)) {
+	console.log(req.body);
+	if (!('name' in body && 'groupId' in body)) {
+
 		res.status(400);
-		res.send("Body must contain a name\n");
+		res.send("Body must contain a name and groupId\n");
 	} else {
-		usersController.newUserTempToken(body["name"], res);
+		usersController.newUserTempToken(body["name"], body["groupId"], res);
 	}
 });
 
