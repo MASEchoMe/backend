@@ -27,12 +27,12 @@ router.post('/api/newUserTempToken', function(req, res, next) {
 
 /* GET a user */
 router.get('/api/getUserTempToken', function(req, res, next) {
-	body = req.body;
-	if (!("name" in body) || !("groupId" in body)) {
+	params = req.params;
+	if (!("name" in params) || !("groupId" in params)) {
 		res.status(400);
-		res.send("Body must contain a name and a groupId\n");
+		res.send("Parameters must contain a name and a groupId\n");
 	} else {
-		usersController.getUserTempToken(body["name"], body["groupId"], res);
+		usersController.getUserTempToken(params["name"], params["groupId"], res);
 	}
 });
 
@@ -48,12 +48,12 @@ router.get('/api/getUserToken', function(req, res, next) {
 
 /* GET all messages from a user. */
 router.get('/api/messages', function(req, res, next) {
-	body = req.body;
-	if (!("name" in body) || !("groupId" in body)) {
+	params = req.params;
+	if (!("name" in params) || !("groupId" in params)) {
 		res.status(400);
 		res.send("Body must contain a name and a groupId\n");
 	} else {
-		usersController.getMessages(body["name"], body["groupId"], res);
+		usersController.getMessages(params["name"], params["groupId"], res);
 	}
 });
 

@@ -77,6 +77,7 @@ var getUserTempToken = function(name, groupId, res) {
             // If the token is wrong or user doesn't exist, throw
             // authentication error.
             res.status(401);
+            res.end();
         } else {
             // If the user does exist, simply return a temporary token
             // that can be used to fetch the permanent token

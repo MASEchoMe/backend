@@ -131,9 +131,9 @@ var getMessages = function(name, groupId, res) {
 	});
 
 	// update the messages to read by changing each message's 'is_read' value to 1
-	query = 'UPDATE messages SET is_read = 1 WHERE recipient_id=?';
+	query = 'UPDATE messages SET is_read = 1 WHERE recipient_name=? and group_id=?';
 
-	connection.query(query, [userId], function (err, results) {
+	connection.query(query, [name, groupId], function (err, results) {
 		if (err) {
 			res.status(400);
 			res.send(err);
