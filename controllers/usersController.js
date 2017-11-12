@@ -69,10 +69,10 @@ var newUserTempToken = function(name, groupId, res) {
  * extended token that you have saved for the account on the
  * Alexa or app.
  */
-var getUserTempToken = function(token, name, res) {
+var getUserTempToken = function(name, groupId, res) {
     tempToken = token16();
     console.log(tempToken);
-    dbController.getUserByTokenAndName(token, name, function(user) {
+    dbController.getUserByNameAndGroupId(name, groupId, function(user) {
         if (user == null) {
             // If the token is wrong or user doesn't exist, throw
             // authentication error.
@@ -83,13 +83,14 @@ var getUserTempToken = function(token, name, res) {
 
             tempToken = token16();
             tempTokens[tempToken] = {
-                "token": user.token,
                 "timestamp": new Date().getTime() / 1000,
-                "name": name
+                "name": name,
+                "groupId": groupId
             };
             res.json({
                 "tempToken": tempToken,
-                "name": user.name
+                "name": user.name,
+                "groupId": groupId
             });
             res.end();
         }
@@ -117,8 +118,8 @@ var getUserToken = function(tempToken, res) {
     }
 }
 
-var getMessages = function(token, name, res) {
-    dbController.getMessages(token, name, res);
+var getMessages = function(name, groupId, res) {
+    dbController.getMessages(name, groupId, res);
 }
 
 var getUnreadMessages = function(token, name, res) {

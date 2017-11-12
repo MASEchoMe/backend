@@ -5,6 +5,8 @@ CREATE SCHEMA IF NOT EXISTS `echome_db`;
 CREATE TABLE `echome_db`.`users` (
   `user_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(50) NOT NULL,
+  `token` VARCHAR(255) NULL,
+  `group_id` VARCHAR(255) NULL,
   `create_date` DATETIME NULL,
   `is_active` TINYINT NULL,
   PRIMARY KEY (`user_id`),
@@ -14,6 +16,7 @@ CREATE TABLE `echome_db`.`users` (
 # Create 'messages' table
 CREATE TABLE `echome_db`.`messages` (
   `message_id` INT NOT NULL AUTO_INCREMENT,
+  `group_id` VARCHAR(255) NULL,
   `sender_id` INT NULL,
   `sender_name` VARCHAR(50),
   `recipient_id` INT NULL,

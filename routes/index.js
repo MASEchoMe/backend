@@ -25,13 +25,14 @@ router.post('/api/newUserTempToken', function(req, res, next) {
 	}
 });
 
+/* GET a user */
 router.get('/api/getUserTempToken', function(req, res, next) {
 	body = req.body;
-	if (!("token" in body)) {
+	if (!("name" in body) || !("groupId" in body)) {
 		res.status(400);
-		res.send("Body must contain a token\n");
+		res.send("Body must contain a name and a groupId\n");
 	} else {
-		usersController.getUserTempToken(body["token"], res);
+		usersController.getUserTempToken(body["name"], body["groupId"], res);
 	}
 });
 
@@ -46,8 +47,14 @@ router.get('/api/getUserToken', function(req, res, next) {
 });
 
 /* GET all messages from a user. */
-router.get('/api/users/:userId', function(req, res, next) {
-	usersController.getMessages(req.get("token"), req.params["userId"], res);
+router.get('/api/messages', function(req, res, next) {
+	body = req.body;
+	if (!("name" in body) || !("groupId" in body)) {
+		res.status(400);
+		res.send("Body must contain a name and a groupId\n");
+	} else {
+		usersController.getMessages(body["name"], body["groupId"], res);
+	}
 });
 
 /* GET only unread messages from a user. */
@@ -58,12 +65,11 @@ router.get('/api/users/unread/:userId', function(req, res, next) {
 /* POST new message */
 router.post('/api/messages', function(req, res, next) {
 	body = req.body;
-	if (!("message" in body) || !("sender" in body) || !("recipient" in body)) {
+	if (!("recipient" in body) || !("groupId" in body) || !("sender" in body) || !("message" in body)) {
 		res.status(400);
-		res.send("Body must contain a message, a sender, and a recipient\n");
+		res.send("Body must contain a recipient, a recipient's groupId, a sender, and a message\n");
 	} else {
-		messagesController.newMessage(req.get("token"),
-				body["message"], body["sender"], body["recipient"], res);
+		messagesController.newMessage(body["recipient"], body["groupId"], body["sender"], body["message"], res);
 	}
 });
 

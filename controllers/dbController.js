@@ -44,23 +44,25 @@ var addUser = function(name, groupId, token, res, callback) {
 /**
  * Add a message to the 'messages' table in the database
  * 
- * @param {*} message
- * @param {*} senderName
  * @param {*} recipientName
+ * @param {*} groupId
+ * @param {*} senderName
+ * @param {*} message
  * @param {*} res
  */
-var addMessage = function(message, senderName, recipientName, res) {
+var addMessage = function(recipientName, groupId, senderName, message, res) {
 	
-	var query = `INSERT INTO messages (sender_id, sender_name, recipient_id,
+	var query = `INSERT INTO messages (group_id, sender_id, sender_name, recipient_id,
 						recipient_name, message, is_read, create_date, expiration_date,
 						is_reminder, next_remind_date, reminder_frequency_id)
 					VALUES (?)`;
 
-	getUsers(senderName, recipientName, function(err, sender, recipient) {
+	getUsers(senderName, recipientName, groupId, function(err, sender, recipient) {
 		if (err) {
 			throw err;
 		} else {
 			var values = [
+				groupId,			//group_id
 				sender.user_id,		//sender_id
 				sender.name,		//sender_name
 				recipient.user_id,	//recipient_id
@@ -114,12 +116,12 @@ var deleteMessage = function(token, messageId, res) {
  * @param {*} userId 
  * @param {*} res 
  */
-var getMessages = function(token, userId, res) {
+var getMessages = function(name, groupId, res) {
 
 	// get the messages for the user with 'user_id'
-	var query = 'SELECT sender_name, message, create_date FROM messages WHERE recipient_id=?';
+	var query = 'SELECT sender_name, message, create_date FROM messages WHERE recipient_name=? and group_id=?';
 
-	connection.query(query, [userId], function (err, results) {
+	connection.query(query, [name, groupId], function (err, results) {
 		if (err) {
 			res.status(400);
 			res.send(err);
@@ -171,17 +173,17 @@ var getUnreadMessages = function(token, userId, res) {
 	});
 }
 
-var getUserByTokenAndName = function(token, name, callback) {
-	// get user with name or token
-	var query = 'SELECT name, token FROM users WHERE name=? and token=?';
+var getUserByNameAndGroupId = function(name, groupId, callback) {
+	// get user with name and groupId
+	var query = 'SELECT name, group_id FROM users WHERE name=? and group_id=?';
 
-	connection.query(query, [name, token], function(err, results) {
+	connection.query(query, [name, groupId], function(err, results) {
 		if (err) {
 			callback(null);
 		} else {
 			var user = {
-				"name ": results[0].name,
-				"token": results[0].token
+				"name": results[0].name,
+				"groupId": results[0].group_id
 			};
 			callback(user);
 		}
@@ -192,17 +194,15 @@ module.exports = {addUser, addMessage, deleteMessage, getMessages, getUnreadMess
 
 /****************************** Helper Methods ******************************/
 
-var getUsers = function(senderName, recipientName, callback) {
+var getUsers = function(senderName, recipientName, groupId, callback) {
 
-	var query = 'SELECT user_id, name FROM users WHERE name=? or name=?';
+	var query = 'SELECT user_id, name FROM users WHERE name=? or name=? and group_id=?';
 	
-	connection.query(query, [senderName, recipientName], function (err, results) {
+	connection.query(query, [senderName, recipientName, groupId], function (err, results) {
 		if (err) {
 			res.status(400);
 			res.send("Sender and/or recipient is not a valid user.\n" + err);
 		} else {
-
-			// TODO: fix this crap code...it is late and I want it to work
 			var sender, recipient;
 			if (results[0].name == senderName) {
 				sender = results[0];
