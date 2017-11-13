@@ -1,29 +1,19 @@
 var amazon = require('amazon-product-api');
 
-var client = amazon.createClient({
-    awsId: process.env.AWS_ID,
-    awsSecret: process.env.AWS_SECRET,
-    awsTag: process.env.AWS_TAG
-  });
-
-// var client = amazon.createClient({
-//     awsId: "AKIAI6RASLQCHLXUANVQ",
-//     awsSecret: "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",
-//     awsTag: "echome0b-20"
-//   });
-
+/**
+ * Gets a product recommendation link for the keyword product
+ * 
+ * @param {*} product 
+ * @param {*} res 
+ */
 var getProductLink = function(product, res) {
     client.itemSearch({
-        director: 'Quentin Tarantino',
-        actor: 'Samuel L. Jackson',
-        searchIndex: 'DVD',
-        audienceRating: 'R',
-        responseGroup: 'ItemAttributes,Offers,Images'
+        keywords: product
       }, function(err, results) {
         if (err) {
           res.send(err);
         } else {
-          res.send(results); 
+          res.send(results[0].DetailPageURL); 
         }
       });
 }
