@@ -8,7 +8,6 @@ var productsController = require('../controllers/productsController');
 
 /* POST a new group */
 router.post('/api/newGroup', function(req, res, next) {
-	body = req.body;
 	usersController.newGroup(res);
 });
 
@@ -40,6 +39,16 @@ router.get('/api/getUser', function(req, res, next) {
 		res.send("Parameters must contain a temporary token\n");
 	} else {
 		usersController.getUser(req.query.tempToken, res);
+	}
+});
+
+/* GET all ative users within a group */
+router.get('/api/getUsers', function(req, res, next) {
+	if (!req.query.groupId) {
+		res.status(400);
+		res.send("Parameters must contain a groupId\n");
+	} else {
+		usersController.getUsersByGroup(req.query.groupId, res);
 	}
 });
 

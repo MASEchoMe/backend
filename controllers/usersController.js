@@ -116,6 +116,16 @@ var getUser = function(tempToken, res) {
     }
 }
 
+/**
+ * Get all the active users within a particular group
+ * 
+ * @param {*} groupId 
+ * @param {*} res 
+ */
+var getUsersByGroup = function(groupId, res) {
+    dbController.getUsersByGroup(groupId, res);
+};
+
 var getMessages = function(name, groupId, res) {
     dbController.getMessages(name, groupId, res);
 }
@@ -125,4 +135,4 @@ var getUnreadMessages = function(name, groupId, res) {
 }
 
 module.exports = {newGroup, newUserTempToken, getUserTempToken, 
-        getUser, getMessages, getUnreadMessages};
+        getUser, getUsersByGroup, getMessages, getUnreadMessages};

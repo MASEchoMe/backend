@@ -189,4 +189,24 @@ var getUserByNameAndGroupId = function(name, groupId, callback) {
 	});
 }
 
-module.exports = {addUser, addMessage, deleteMessage, getMessages, getUnreadMessages, getUserByNameAndGroupId};
+/**
+ * Get all the active users within a particular group
+ * 
+ * @param {*} groupId 
+ * @param {*} res 
+ */
+var getUsersByGroup = function(groupId, res) {
+	var query = 'SELECT name FROM users WHERE group_id=? and is_active=1';
+	
+	connection.query(query, [groupId], function (err, results) {
+		if (err) {
+			res.status(400);
+			res.send(err);
+		} else {
+			res.send(results);
+		}
+	});
+};
+
+module.exports = {addUser, addMessage, deleteMessage, getMessages, getUnreadMessages,
+		getUserByNameAndGroupId, getUsersByGroup};
