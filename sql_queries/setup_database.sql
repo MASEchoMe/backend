@@ -5,6 +5,8 @@ CREATE SCHEMA IF NOT EXISTS `echome_db`;
 CREATE TABLE `echome_db`.`users` (
   `user_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(50) NOT NULL,
+  `token` VARCHAR(255) NULL,
+  `group_id` VARCHAR(255) NULL,
   `create_date` DATETIME NULL,
   `is_active` TINYINT NULL,
   PRIMARY KEY (`user_id`),
@@ -14,9 +16,8 @@ CREATE TABLE `echome_db`.`users` (
 # Create 'messages' table
 CREATE TABLE `echome_db`.`messages` (
   `message_id` INT NOT NULL AUTO_INCREMENT,
-  `sender_id` INT NULL,
+  `group_id` VARCHAR(255) NULL,
   `sender_name` VARCHAR(50),
-  `recipient_id` INT NULL,
   `recipient_name` VARCHAR(50),
   `message` MEDIUMTEXT NULL,
   `is_read` TINYINT NULL,
@@ -27,19 +28,7 @@ CREATE TABLE `echome_db`.`messages` (
   `reminder_frequency_id` INT NULL,
   PRIMARY KEY (`message_id`),
   UNIQUE INDEX `message_id_UNIQUE` (`message_id` ASC),
-  INDEX `sender_id_idx` (`sender_id` ASC),
-  INDEX `recipient_id_idx` (`recipient_id` ASC),
   INDEX `reminder_frequency_id_idx` (`reminder_frequency_id` ASC),
-  CONSTRAINT `sender_id`
-    FOREIGN KEY (`sender_id`)
-    REFERENCES `echome_db`.`users` (`user_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `recipient_id`
-    FOREIGN KEY (`recipient_id`)
-    REFERENCES `echome_db`.`users` (`user_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
   CONSTRAINT `reminder_frequency_id`
     FOREIGN KEY (`reminder_frequency_id`)
     REFERENCES `echome_db`.`reminder_frequency` (`id`)
