@@ -70,8 +70,6 @@ var newUserTempToken = function(name, groupId, res) {
  * Alexa or app.
  */
 var getUserTempToken = function(name, groupId, res) {
-    tempToken = token16();
-    console.log(tempToken);
     dbController.getUserByNameAndGroupId(name, groupId, function(user) {
         if (user == null) {
             // If the token is wrong or user doesn't exist, throw
@@ -81,7 +79,6 @@ var getUserTempToken = function(name, groupId, res) {
         } else {
             // If the user does exist, simply return a temporary token
             // that can be used to fetch the permanent token
-
             tempToken = token16();
             tempTokens[tempToken] = {
                 "timestamp": new Date().getTime() / 1000,
@@ -103,14 +100,14 @@ var getUserTempToken = function(name, groupId, res) {
  * call this method with the temporary token as a parameter
  * to retrieve the full token
  */
-var getUserToken = function(tempToken, res) {
+var getUser = function(tempToken, res) {
     var time = new Date().getTime() / 1000;
     if (tempToken in tempTokens &&
                 time - tempTokens[tempToken].timestamp < 60000) {
-        console.log("Getting the user's token");
+        console.log("Getting the user");
         res.json({
-            "token": tempTokens[tempToken].token,
-            "name": tempTokens[tempToken].name
+            "name": tempTokens[tempToken].name,
+            "groupId": tempTokens[tempToken].groupId
         });
         res.end();
     } else {
@@ -123,9 +120,9 @@ var getMessages = function(name, groupId, res) {
     dbController.getMessages(name, groupId, res);
 }
 
-var getUnreadMessages = function(token, name, res) {
-    dbController.getUnreadMessages(token, name, res);
+var getUnreadMessages = function(name, groupId, res) {
+    dbController.getUnreadMessages(name, groupId, res);
 }
 
 module.exports = {newGroup, newUserTempToken, getUserTempToken, 
-        getUserToken, getMessages, getUnreadMessages};
+        getUser, getMessages, getUnreadMessages};

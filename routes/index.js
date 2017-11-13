@@ -6,18 +6,16 @@ var messagesController = require('../controllers/messagesController');
 var usersController = require('../controllers/usersController');
 var productsController = require('../controllers/productsController');
 
-/* POST new group */
+/* POST a new group */
 router.post('/api/newGroup', function(req, res, next) {
 	body = req.body;
 	usersController.newGroup(res);
 });
 
-/* POST new user */
+/* POST a new user */
 router.post('/api/newUserTempToken', function(req, res, next) {
 	body = req.body;
-	console.log(req.body);
 	if (!('name' in body && 'groupId' in body)) {
-
 		res.status(400);
 		res.send("Body must contain a name and groupId\n");
 	} else {
@@ -25,44 +23,37 @@ router.post('/api/newUserTempToken', function(req, res, next) {
 	}
 });
 
-/* GET a user */
+/* GET an existing user's temporary token */
 router.get('/api/getUserTempToken', function(req, res, next) {
-	params = req.params;
-	if (!("name" in params) || !("groupId" in params)) {
+	if (!req.query.name || !req.query.groupId) {
 		res.status(400);
 		res.send("Parameters must contain a name and a groupId\n");
 	} else {
-		usersController.getUserTempToken(params["name"], params["groupId"], res);
+		usersController.getUserTempToken(req.query.name, req.query.groupId, res);
 	}
 });
 
-router.get('/api/getUserToken', function(req, res, next) {
-	body = req.body;
-	if (!("tempToken" in body)) {
+/* GET an existing user via a temporary token */
+router.get('/api/getUser', function(req, res, next) {
+	if (!req.query.tempToken) {
 		res.status(400);
-		res.send("Body must contain a tempToken\n");
+		res.send("Parameters must contain a temporary token\n");
 	} else {
-		usersController.getUserToken(body["tempToken"], res);
+		usersController.getUser(req.query.tempToken, res);
 	}
 });
 
-/* GET all messages from a user. */
+/* GET all messages for a specific user */
 router.get('/api/messages', function(req, res, next) {
-	params = req.params;
-	if (!("name" in params) || !("groupId" in params)) {
+	if (!req.query.name || !req.query.groupId) {
 		res.status(400);
-		res.send("Body must contain a name and a groupId\n");
+		res.send("Parameters must contain a name and a groupId\n");
 	} else {
-		usersController.getMessages(params["name"], params["groupId"], res);
+		usersController.getMessages(req.query.name, req.query.groupId, res);
 	}
 });
 
-/* GET only unread messages from a user. */
-router.get('/api/users/unread/:userId', function(req, res, next) {
-	usersController.getUnreadMessages(req.get("token"), req.params["userId"], res);
-});
-
-/* POST new message */
+/* POST a new message */
 router.post('/api/messages', function(req, res, next) {
 	body = req.body;
 	if (!("recipient" in body) || !("groupId" in body) || !("sender" in body) || !("message" in body)) {
@@ -73,9 +64,25 @@ router.post('/api/messages', function(req, res, next) {
 	}
 });
 
-/* DELETE a message (must have receiver's token) */
-router.delete('/api/messages/:messageId', function(req, res, next) {
-	messagesController.deleteMessage(req.get("token"), req.params["messageId"], res)
+/* DELETE a message for a specific user */
+router.delete('/api/messages', function(req, res, next) {
+	body = req.body;
+	if (!("messageId" in body)) {
+		res.status(400);
+		res.send("Body must contain a messageId\n");
+	} else {
+		messagesController.deleteMessage(body["messageId"], res);
+	}
+});
+
+/* GET only unread messages for a specific user */
+router.get('/api/messages/unread', function(req, res, next) {
+	if (!req.query.name || !req.query.groupId) {
+		res.status(400);
+		res.send("Parameters must contain a name and a groupId\n");
+	} else {
+		usersController.getUnreadMessages(req.query.name, req.query.groupId, res);
+	}
 });
 
  /* GET a product recommendation */

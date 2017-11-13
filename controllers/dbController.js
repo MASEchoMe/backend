@@ -95,7 +95,7 @@ var addMessage = function(recipientName, groupId, senderName, message, res) {
  * @param {*} messageId 
  * @param {*} res 
  */
-var deleteMessage = function(token, messageId, res) {
+var deleteMessage = function(messageId, res) {
 
 	var query = 'DELETE FROM messages WHERE message_id=?';
 	
@@ -119,7 +119,7 @@ var deleteMessage = function(token, messageId, res) {
 var getMessages = function(name, groupId, res) {
 
 	// get the messages for the user with 'user_id'
-	var query = 'SELECT sender_name, message, create_date FROM messages WHERE recipient_name=? and group_id=?';
+	var query = 'SELECT sender_name, message, message_id, create_date FROM messages WHERE recipient_name=? and group_id=?';
 
 	connection.query(query, [name, groupId], function (err, results) {
 		if (err) {
@@ -148,12 +148,13 @@ var getMessages = function(name, groupId, res) {
  * @param {*} userId 
  * @param {*} res 
  */
-var getUnreadMessages = function(token, userId, res) {
+var getUnreadMessages = function(name, groupId, res) {
 	
 	// get the messages for the user with 'user_id'
-	var query = 'SELECT sender_name, message, create_date FROM messages WHERE recipient_id=? and is_read=0';
+	var query = 'SELECT sender_name, message, message_id, create_date FROM messages '
+				+ 'WHERE recipient_name=? and group_id=? and is_read=0';
 
-	connection.query(query, [userId], function (err, results) {
+	connection.query(query, [name, groupId], function (err, results) {
 		if (err) {
 			res.status(400);
 			res.send(err);
@@ -163,9 +164,9 @@ var getUnreadMessages = function(token, userId, res) {
 	});
 
 	// update the messages to read by changing each message's 'is_read' value to 1
-	query = 'UPDATE messages SET is_read = 1 WHERE recipient_id=?';
+	query = 'UPDATE messages SET is_read = 1 WHERE recipient_name=? and group_id=?';
 
-	connection.query(query, [userId], function (err, results) {
+	connection.query(query, [name, groupId], function (err, results) {
 		if (err) {
 			res.status(400);
 			res.send(err);
@@ -190,7 +191,7 @@ var getUserByNameAndGroupId = function(name, groupId, callback) {
 	});
 }
 
-module.exports = {addUser, addMessage, deleteMessage, getMessages, getUnreadMessages};
+module.exports = {addUser, addMessage, deleteMessage, getMessages, getUnreadMessages, getUserByNameAndGroupId};
 
 /****************************** Helper Methods ******************************/
 
