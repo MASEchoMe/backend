@@ -12,7 +12,7 @@ the following API instructions:
 | POST | `/api/newUserTempToken` | name, groupId | Create a new user with a temporary token |
 | GET | `/api/getUserTempToken` | name, groupId | Get the temporary token for an exisiting user |
 | GET | `/api/getUser` | tempToken | Get an existing user via his/her temporary token |
-| GET | `/api/getUsers` | groupId | Get all acitve users within a group |
+| GET | `/api/getUsers` | groupId | Get all active users within a group |
 | GET | `/api/messages` | name, groupId | Get all messages for an exisiting user |
 | POST | `/api/messages` | recipient, groupId, sender, message | Send a message from sender to recipient |
 | DELETE | `/api/messages` | messageId | Delete a message by its ID |
