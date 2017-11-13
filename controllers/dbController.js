@@ -44,9 +44,9 @@ var addUser = function(name, groupId, token, res, callback) {
 /**
  * Add a message to the 'messages' table in the database
  * 
- * @param {*} recipientName
+ * @param {*} recipient
  * @param {*} groupId
- * @param {*} senderName
+ * @param {*} sender
  * @param {*} message
  * @param {*} res
  */
@@ -83,7 +83,6 @@ var addMessage = function(recipient, groupId, sender, message, res) {
 /**
  * Deletes a message from the 'messages' table in the database
  * 
- * @param {*} token 
  * @param {*} messageId 
  * @param {*} res 
  */
@@ -104,8 +103,8 @@ var deleteMessage = function(messageId, res) {
 /**
  * Returns all the messages for a particular user
  * 
- * @param {*} token
- * @param {*} userId 
+ * @param {*} name
+ * @param {*} groupId 
  * @param {*} res 
  */
 var getMessages = function(name, groupId, res) {
@@ -136,8 +135,8 @@ var getMessages = function(name, groupId, res) {
 /**
  * Returns all the unread messages for a particular user
  * 
- * @param {*} token 
- * @param {*} userId 
+ * @param {*} name 
+ * @param {*} groupId 
  * @param {*} res 
  */
 var getUnreadMessages = function(name, groupId, res) {
@@ -166,6 +165,13 @@ var getUnreadMessages = function(name, groupId, res) {
 	});
 }
 
+/**
+ * Returns a user using his/her name and groupId
+ * 
+ * @param {*} name 
+ * @param {*} groupId 
+ * @param {*} callback 
+ */
 var getUserByNameAndGroupId = function(name, groupId, callback) {
 	// get user with name and groupId
 	var query = 'SELECT name, group_id FROM users WHERE name=? and group_id=?';
