@@ -87,12 +87,11 @@ router.get('/api/messages/unread', function(req, res, next) {
 
  /* GET a product recommendation */
 router.get('/api/products', function(req, res, next) {
-	body = req.body;
-	if (!("product" in body)) {
+	if (!req.query.product) {
 		res.status(400);
-		res.send("Body must contain a product search term\n");
+		res.send("Parameters must contain a product\n");
 	} else {
-		productsController.getProductLink(req.get("token"), body["product"], res);
+		productsController.getProductLink(req.query.product, res);
 	}
 })
 
