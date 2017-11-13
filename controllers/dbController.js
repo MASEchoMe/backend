@@ -50,40 +50,32 @@ var addUser = function(name, groupId, token, res, callback) {
  * @param {*} message
  * @param {*} res
  */
-var addMessage = function(recipientName, groupId, senderName, message, res) {
+var addMessage = function(recipient, groupId, sender, message, res) {
 	
-	var query = `INSERT INTO messages (group_id, sender_id, sender_name, recipient_id,
-						recipient_name, message, is_read, create_date, expiration_date,
+	var query = `INSERT INTO messages (group_id, sender_name, recipient_name,
+						message, is_read, create_date, expiration_date,
 						is_reminder, next_remind_date, reminder_frequency_id)
 					VALUES (?)`;
 
-	getUsers(senderName, recipientName, groupId, function(err, sender, recipient) {
-		if (err) {
-			throw err;
-		} else {
-			var values = [
-				groupId,			//group_id
-				sender.user_id,		//sender_id
-				sender.name,		//sender_name
-				recipient.user_id,	//recipient_id
-				recipient.name,		//recipient_name
-				message,			//message
-				0,					//is_read
-				new Date(),			//create_date
-				null,				//expiration_date
-				0,					//is_reminder
-				null,				//next_remind_date
-				null				//reminder_frequency_id
-			];
+	var values = [
+		groupId,			//group_id
+		sender,		//sender_name
+		recipient,		//recipient_name
+		message,			//message
+		0,					//is_read
+		new Date(),			//create_date
+		null,				//expiration_date
+		0,					//is_reminder
+		null,				//next_remind_date
+		null				//reminder_frequency_id
+	];
 
-			connection.query(query, [values], function (err, results) {
-				if (err) {
-					res.status(400);
-					res.write(err);
-				} else {
-					res.write("Successfully added " + senderName + "'s message to " + recipientName);
-				}
-			});
+	connection.query(query, [values], function (err, results) {
+		if (err) {
+			res.status(400);
+			res.send(err);
+		} else {
+			res.send("Successfully added " + sender + "'s message to " + recipient);
 		}
 	});
 }
@@ -192,29 +184,3 @@ var getUserByNameAndGroupId = function(name, groupId, callback) {
 }
 
 module.exports = {addUser, addMessage, deleteMessage, getMessages, getUnreadMessages, getUserByNameAndGroupId};
-
-/****************************** Helper Methods ******************************/
-
-var getUsers = function(senderName, recipientName, groupId, callback) {
-
-	var query = 'SELECT user_id, name FROM users WHERE name=? or name=? and group_id=?';
-	
-	connection.query(query, [senderName, recipientName, groupId], function (err, results) {
-		if (err) {
-			res.status(400);
-			res.send("Sender and/or recipient is not a valid user.\n" + err);
-		} else {
-			var sender, recipient;
-			if (results[0].name == senderName) {
-				sender = results[0];
-				recipient = results[1];
-			} else {
-				sender = results[1];
-				recipient = results[0];
-			}
-			callback(null, sender, recipient);
-		}
-	});
-}
-
-
